@@ -1,0 +1,225 @@
+# ============================================================
+#  FloatDream 聊天系统  fdchat
+#  改完执行  /fd reload   即时生效（广告库可单独 /fd reload ads）
+# ============================================================
+
+# ---------- 共享 MySQL（复用生产现有实例） ----------
+mysql:
+  host: "fd.fdsql"
+  port: 3306
+  database: "floatdream"
+  username: "sc"
+  password: "CHANGE_ME"
+  table-prefix: "fdchat_"
+  pool-size: 4
+  # 旧 nickname_FD 的昵称表（一次性迁移用）
+  legacy-nick-table: "nicks"
+
+# ---------- 经济（XConomy 余额，直连 MySQL） ----------
+economy:
+  enabled: true
+  host: "sc.fdsql"
+  port: 3306
+  database: "sc"
+  username: "sc"
+  password: "CHANGE_ME"
+  currency-name: "元"
+  # XConomy 每服一张余额表：xconomy_<suffix>
+  wallet-table: "xconomy_sc"
+  # 同一次操作的最小间隔，防连点重复扣费
+  debit-cooldown-ms: 2500
+
+# ---------- 中文名 ----------
+nickname:
+  enabled: true
+  min-length: 2
+  max-length: 6
+  regex: "^[\\u4e00-\\u9fa5]{2,6}$"
+  # 首次设置免费；之后每次更换收费
+  first-free: true
+  change-cost: 5000.0
+  # 两次改名之间的冷却（秒）
+  change-cooldown-seconds: 0
+  # 未设置中文名时是否禁止聊天
+  require-for-chat: true
+  # 设置成功后是否全服广播
+  broadcast-change: true
+  # 额外的昵称黑名单（与 advertisements.yml 的 nickname-blacklist 合并）
+  blacklist:
+    - "管理员"
+    - "官方"
+    - "客服"
+    - "系统"
+    - "服主"
+    - "腐竹"
+  # 绕过收费与唯一性检查（仍受黑名单与正则限制）
+  bypass-permission: "fdchat.nickname.bypass"
+
+# ---------- 频道 ----------
+channels:
+
+  # 全局频道：! 开头
+  global:
+    enabled: true
+    prefix: "!"
+    # ★ 全服免费开关。
+    #   true  = 默认频道就是全局，且完全免费
+    #   false = 全局改为收费(toll)，且玩家默认落到本服频道
+    free: true
+    # free: false 时的单条价格
+    toll: 200.0
+    # 玩家进服后的默认说话频道：true=全局，false=本服
+    #   注：当 free=false 时此项被强制视为 false（默认本服）
+    default: true
+    cooldown-seconds: 3
+    tag: "<yellow><bold>[全服]</bold></yellow>"
+
+  # 本服频道（无前缀）
+  server:
+    enabled: true
+    prefix: ""
+    cooldown-seconds: 2
+    tag: "<aqua><bold>[本服]</bold></aqua>"
+
+  # 公会频道（预留接口）
+  guild:
+    enabled: false
+    prefix: "#"
+    cooldown-seconds: 2
+    tag: "<light_purple><bold>[公会]</bold></light_purple>"
+    disabled-message: "<red>公会频道尚未开放。"
+
+  # 本地/范围频道
+  local:
+    enabled: true
+    prefix: "~"
+    cooldown-seconds: 1
+    tag: "<gray><bold>[附近]</bold></gray>"
+    # 半径（格）。需要后端上报坐标才精确；未上报时退化为「同子服可见」
+    radius: 100
+    # 半径内无人时是否提示
+    notify-empty: true
+
+  # 私聊
+  private:
+    enabled: true
+    aliases: ["t", "tell", "msg", "w", "m", "私聊"]
+    # 允许用中文名作为收件人
+    accept-nickname: true
+    # 提示音，留空则不响
+    sound: "minecraft:entity.experience_orb.pickup"
+    # 发给自己的格式（%sender% %recipient% %message%）
+    format-to: "<gold>[<green>你</green>] <dark_gray>-></dark_gray> [<green>%recipient%</green>]</gold> <white>%message%</white>"
+    format-from: "<gold>[<green>%sender%</green>] <dark_gray>-></dark_gray> [<green>你</green>]</gold> <white>%message%</white>"
+    format-spy: "<dark_red>SPY</dark_red> <gray>[</gray><green>%sender%</green><gray>] -> [</gray><green>%recipient%</green><gray>]</gray> <white>%message%</white>"
+
+# ---------- 聊天格式 ----------
+# 可用占位符：
+#   <channel_tag>  <nickname>  <username>  <message>  <mention>...
+#   <fd_server> <fd_server_tag> <fd_world> <fd_location>   ← 来自 fdtags
+#   <prefix> <luckperms_suffix>                  ← 来自 MiniPlaceholders 扩展
+format:
+  # 主格式。%channel_tag% 等用 MiniMessage 标签形式书写
+  chat: "<channel_tag><prefix><hover:show_text:'<yellow>游戏ID:</yellow> <white><username></white>\n<yellow>点击私聊</yellow>'><click:suggest_command:'/t <username> '><white><nickname></white></click></hover><dark_gray>:</dark_gray> <message>"
+  # 控制台看到的格式
+  console: "[<channel>] <username>: <message>"
+
+# ---------- @提及 ----------
+mention:
+  enabled: true
+  prefix: "@"
+  # 被提及者名字的高亮色
+  highlight-color: "yellow"
+  # 是否播放音效
+  play-sound: true
+  sound: "minecraft:block.anvil.use"
+  sound-source: "master"
+  volume: 1.0
+  pitch: 1.0
+  # 单条消息最多提及人数（防止刷屏）
+  max-per-message: 5
+  # 提及自己是否也响
+  notify-self: false
+  # 需要该权限才能听到提示音（留空表示所有人）
+  sound-permission: ""
+  # 被提及时的悬停/点击行为
+  hover: "<yellow>点击私聊 <white>%name%</white></yellow>"
+
+# ---------- 管理（细规则见 advertisements.yml / spam.yml） ----------
+moderation:
+  anti-advertisement: true
+  anti-spam: true
+  # 命中广告时：block | replace | warn
+  ad-action: "block"
+  # 是否输出审计日志
+  log-blocked: true
+  # 豁免全部审核
+  bypass-permission: "fdchat.moderation.bypass"
+  # 接收管理员提醒
+  notify-permission: "fdchat.moderation.notify"
+
+# ---------- 昵称->ID 重写（让中文名能用在 /tpa 等指令里） ----------
+identity:
+  enabled: true
+  # 是否启用「唯一前缀」匹配（如输入“蚊”匹配到“蚊香”）
+  allow-prefix-match: true
+  # 前缀匹配的最短长度，太短容易歧义
+  min-prefix-length: 2
+  # 只对这些指令做参数重写；留空表示全部指令
+  # 建议显式列出，避免误伤
+  commands:
+    - "tpa"
+    - "tpahere"
+    - "tpaccept"
+    - "tpdeny"
+    - "tp"
+    - "tphere"
+    - "t"
+    - "tell"
+    - "msg"
+    - "w"
+    - "pay"
+    - "trade"
+    - "trademe"
+    - "mail"
+    - "mailbox"
+    - "mail send"
+    - "invite"
+    - "party invite"
+    - "friend add"
+    - "duel"
+    - "lands trust"
+    - "lands untrust"
+    - "res trust"
+    - "cmi tpa"
+    - "cmi pay"
+  # 即使不在上面列表，也始终重写这些「第一个参数一定是玩家」的指令
+  always-rewrite-first-arg: []
+  # 指令黑名单（绝不重写）
+  command-blacklist:
+    - "login"
+    - "register"
+    - "changepassword"
+    - "email"
+
+# ---------- 其他 ----------
+settings:
+  # 调试模式：输出昵称解析、指令重写的判定过程
+  debug: false
+  # 语言文件（放 plugins/fdchat/lang/<name>.yml）
+  locale: "zh_CN"
+
+# ---------- AI 助手（独立插件 fdai 接入） ----------
+# fdchat 只提供入口与接口，不内置任何 AI 调用。
+# AI 插件通过 fd.chat.api.FdChatApiRegistry 注册后即可接管。
+ai:
+  # 玩家以此前缀提问（不当作聊天发送）
+  question-prefix: "??"
+  # 指令输错时，是否在本地做「相近指令」提示（无需 AI）
+  suggest-on-unknown-command: true
+  # 本地联想的编辑距离阈值
+  max-edit-distance: 3
+  # 每次最多给出几条建议
+  max-suggestions: 3
+  # 本地联想是否也包含玩家名/中文名
+  include-player-names: true

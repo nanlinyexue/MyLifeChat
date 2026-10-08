@@ -1,0 +1,77 @@
+# ============================================================
+#  广告内容库  advertisements.yml
+#  独立文件，可单独热重载：/fd reload ads
+#  取向：先宽松。误伤时把对应规则 enabled 改成 false 即可。
+# ============================================================
+
+# 命中处理：block（拦截） | replace（替换） | warn（仅提醒管理员）
+action: "block"
+
+block-message: "<red>消息包含疑似广告内容，已被拦截。如有误判请联系管理员。"
+
+# 管理员提醒格式：%player% %message% %rule%
+notify-format: "<dark_gray>[<red>反广告<dark_gray>] <yellow>%player% <gray>触发 <white>%rule%<gray>：<white>%message%"
+
+replacement: "***"
+
+rules:
+  - name: "QQ号"
+    enabled: true
+    pattern: "(?i)(qq|扣扣|企鹅|q群|群号|加群|进群|群聊|交流群)\\s*[:：]?\\s*\\d{5,12}"
+
+  - name: "纯长数字(易误伤,默认关)"
+    enabled: false
+    pattern: "\\b\\d{6,12}\\b"
+
+  - name: "微信号"
+    enabled: true
+    pattern: "(?i)(微信|vx|wx|v信|weixin)\\s*[:：]?\\s*[a-zA-Z][a-zA-Z0-9_-]{5,19}"
+
+  - name: "QQ群链接"
+    enabled: true
+    pattern: "(?i)(qun\\.qq\\.com|jq\\.qq\\.com|qm\\.qq\\.com)"
+
+  - name: "服务器宣传"
+    enabled: true
+    pattern: "(?i)(加(我|一下)?(的)?(服务器|服)|来(我|玩)(的)?服|新服(开|开放)|公益服|氪金服|福利服)"
+
+  - name: "IP地址"
+    enabled: true
+    pattern: "\\b(?:\\d{1,3}\\.){3}\\d{1,3}(?::\\d{2,5})?\\b"
+
+  - name: "域名"
+    enabled: true
+    pattern: "(?i)\\b[a-z0-9][a-z0-9-]{1,62}\\.(com|cn|net|org|top|xyz|cc|me|tk|ml|ga|vip|shop|site|online|club|fun|icu)\\b"
+
+  - name: "点号变体域名"
+    enabled: true
+    pattern: "(?i)[a-z0-9\\-]+\\s*(\\(dot\\)|\\[dot\\]|dot)\\s*(com|cn|net|org|top|xyz|cc)\\b"
+
+  - name: "私聊引流"
+    enabled: true
+    pattern: "(?i)(私聊我|加我(好友|微信|qq)?|联系我|找我(买|要|领)|详情(私聊|加群))"
+
+  - name: "外链"
+    enabled: true
+    pattern: "(?i)(https?://|www\\.)\\S+"
+
+  - name: "交易诱导"
+    enabled: true
+    pattern: "(?i)(低价(出售|出)|高价(收|回收)|代充|代练|脚本|外挂|辅助|破解)"
+
+# 白名单：内容包含其中任一项则不判为广告
+whitelist:
+  - "floatdream"
+  - "一梦千年"
+  - "mc.floatdream.cn"
+
+# 昵称黑名单（与 config.yml 的 nickname.blacklist 合并）
+nickname-blacklist:
+  - "管理员"
+  - "官方"
+  - "客服"
+  - "系统"
+  - "服主"
+  - "腐竹"
+  - "gm"
+  - "op"

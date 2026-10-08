@@ -1,0 +1,36 @@
+# ============================================================
+#  反刷屏  spam.yml
+#  取向：宽松。只拦明显的机器式刷屏。
+# ============================================================
+
+# 两条消息之间的最小间隔（毫秒）
+min-interval-ms: 700
+
+# 滑动窗口
+window-seconds: 5
+max-messages-in-window: 5
+
+# 完全重复
+duplicate-threshold: 3
+duplicate-window-seconds: 15
+# 比较前是否归一化（去空白与标点、转小写）
+normalize-before-compare: true
+
+# 大写字母占比（中文字符不计入）
+caps-ratio-threshold: 0.8
+caps-min-length: 8
+
+# 同一字符连续出现
+repeat-char-threshold: 8
+
+# block | mute（mute = 拦截并自动禁言）
+action: "block"
+mute-seconds: 60
+
+block-message: "<red>发言太快了，请稍后再试。"
+# 达到该次数后的升级提示
+warn-threshold: 3
+warn-message: "<red>请勿刷屏，继续刷屏将被禁言。"
+
+log-blocked: true
+bypass-permission: "fdchat.moderation.bypass"

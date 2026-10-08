@@ -1,0 +1,22 @@
+# 构建产物
+build/
+out/
+target/
+*.class
+
+# 依赖 jar（编译期依赖，不入库；见 README 的依赖说明）
+libs/*.jar
+
+# 生产/本地真实配置（含数据库密码，绝不入库）
+src/config.yml
+backups/
+*.bak
+*.bak-*
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
