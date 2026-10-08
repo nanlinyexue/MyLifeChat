@@ -1,0 +1,7 @@
+name: MyLifeChatBridge
+version: 1.0.0
+main: cn.floatdream.chatbridge.MyLifeChatBridge
+api-version: '1.19'
+authors: [floatdream]
+description: MyLifeChat 后端桥 —— 聊天框 @ 补全 + 提及音效（代理侧受版本限制，改在 Paper 侧实现）
+website: https://floatdream.cn

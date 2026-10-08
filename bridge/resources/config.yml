@@ -1,0 +1,19 @@
+# MyLifeChat 后端桥配置
+# 本插件只做两件 Velocity 侧做不到的事：
+#   1) 聊天框 @ 的 Tab 补全（Velocity 的事件限于 1.13 以下 + 代理指令）
+#   2) 提及音效（Velocity 的 playSound 对 1.19.3 以下客户端直接跳过）
+
+tab-complete:
+  enabled: true
+  # 提及前缀，与代理端 mention.prefix 保持一致
+  prefix: "@"
+  # 只打 @ 时是否列出全部在线玩家
+  list-all: true
+  # 最多补全多少条
+  limit: 40
+
+# 全服在线名单刷新间隔（tick，20=1秒）
+names-refresh-ticks: 100
+
+# 调试日志
+debug: false

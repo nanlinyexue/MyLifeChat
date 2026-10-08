@@ -1,0 +1,17 @@
+# 构建产物
+build/
+out/
+target/
+*.class
+*.jar
+
+# 编译期依赖（Paper API 与 adventure，体积大且可重新获取；见 README）
+libs/*.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
